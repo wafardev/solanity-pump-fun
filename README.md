@@ -3,6 +3,7 @@
 I originally copied this from here: https://github.com/ChorusOne/solanity
 
 Then I made the following changes:
+
 1. Initialise the search using entropy from the OS (it was deterministic)
 2. Exact matches only (there was some weird lowercase thing going on)
 3. Exit criteria based on number of keys found or iterations
@@ -14,7 +15,7 @@ A Solana keypair file is a text file with one line, that has 64 bytes as decimal
 
 [59,140,24,207,208,39,85,22,191,118,230,168,183,34,21,196,25,202,215,167,74,68,74,29,50,247,170,102,19,66,27,104,136,17,198,97,155,247,112,195,114,159,140,43,11,156,171,32,112,188,1,46,231,106,16,148,200,105,30,83,19,235,139,5]
 
-Paste this one line into a file keypair.json for example, and test it by sending funds to and from it. 
+Paste this one line into a file keypair.json for example, and test it by sending funds to and from it.
 
 Using a single Tesla V100 searching for AAAA only, you should find a match under 10 seconds, for AAAAA average time is 12 minutes.
 
@@ -25,7 +26,8 @@ nb: I changed the logging of 'attempts', the original author thought it should b
 NO WARRANTY OR LIABILITY WHATSOEVER, IN THIS WORLD OR THE WORLD TO COME, YOUR SOUL IS YOUR OWN RESPONSIBILITY.
 
 The original instructions are reproduced below and are correct for build:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+````
 
 # A CUDA based ed25519 vanity key finder (in Base58)
 
@@ -49,3 +51,4 @@ $ make -j$(nproc)
 ```bash
 LD_LIBRARY_PATH=./src/release ./src/release/cuda_ed25519_vanity
 ```
+````

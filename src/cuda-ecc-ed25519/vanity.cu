@@ -240,8 +240,11 @@ void __global__ vanity_scan(curandState* state, int* keys_found, int* gpu, int* 
             		return;
         	}
         	int letter_count = 0;
-        	for(; prefixes[n][letter_count]!=0; letter_count++);
-        	prefix_letter_counts[n] = letter_count;
+
+			// Calculate length manually (alternative to strlen)
+			for (; prefixes[n][letter_count] != '\0'; ++letter_count);
+
+			prefix_letter_counts[n] = letter_count;
     	}
 
 	// Local Kernel State
@@ -399,16 +402,25 @@ void __global__ vanity_scan(curandState* state, int* keys_found, int* gpu, int* 
 		// this.
 
                 for (int i = 0; i < sizeof(prefixes) / sizeof(prefixes[0]); ++i) {
+					// Manually calculate the length of the key array
+					int key_length = 0;
+					while (key[key_length] != '\0') {
+						key_length++;
+					}
 
                         for (int j = 0; j<prefix_letter_counts[i]; ++j) {
 
+							int suffix_length = prefix_letter_counts[i];
+
+							int key_index = key_length - suffix_length + j;
+
 				// it doesn't match this prefix, no need to continue
-				if ( !(prefixes[i][j] == '?') && !(prefixes[i][j] == key[j]) ) {
+				if (!(prefixes[i][j] == '?') && !(prefixes[i][j] == key[key_index])) {
 					break;
 				}
 
                                 // we got to the end of the prefix pattern, it matched!
-                                if ( j == ( prefix_letter_counts[i] - 1) ) {
+                                if ( j == ( suffix_length - 1) ) {
                                         atomicAdd(keys_found, 1);
                                         //size_t pkeysize = 256;
                                         //b58enc(pkey, &pkeysize, seed, 32);
@@ -422,22 +434,22 @@ void __global__ vanity_scan(curandState* state, int* keys_found, int* gpu, int* 
 					// as an array of decimal numbers in json format
 
                                         printf("GPU %d MATCH %s - ", *gpu, key);
-                                        for(int n=0; n<sizeof(seed); n++) { 
-						printf("%02x",(unsigned char)seed[n]); 
-					}
-					printf("\n");
+										for(int n=0; n<sizeof(seed); n++) { 
+											printf("%02x",(unsigned char)seed[n]); 
+										}
+										printf("\n");
 					
-                                        printf("[");
-					for(int n=0; n<sizeof(seed); n++) { 
-						printf("%d,",(unsigned char)seed[n]); 
-					}
-                                        for(int n=0; n<sizeof(publick); n++) {
-					        if ( n+1==sizeof(publick) ) {	
-							printf("%d",publick[n]);
-						} else {
-							printf("%d,",publick[n]);
-						}
-					}
+										printf("[");
+										for(int n=0; n<sizeof(seed); n++) { 
+											printf("%d,",(unsigned char)seed[n]); 
+										}
+										for(int n=0; n<sizeof(publick); n++) {
+											if ( n+1==sizeof(publick) ) {	
+												printf("%d",publick[n]);
+											} else {
+												printf("%d,",publick[n]);
+											}
+										}
                                         printf("]\n");
 
 					/*
