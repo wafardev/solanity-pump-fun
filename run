@@ -1,3 +1,22 @@
 #!/bin/bash
 
-LD_LIBRARY_PATH=./src/release ./src/release/cuda_ed25519_vanity;
+# Create output directory if it doesn't exist
+mkdir -p output
+
+# Run the vanity key generator and process its output
+LD_LIBRARY_PATH=./src/release ./src/release/cuda_ed25519_vanity | while read -r line; do
+    echo "$line"  # Still show output in console
+    
+    # Check if line contains a MATCH
+    if [[ $line == *"MATCH"* ]]; then
+        # Extract public key (everything between MATCH and -)
+        pubkey=$(echo "$line" | grep -o 'MATCH [^ ]* -' | sed 's/MATCH \(.*\) -/\1/')
+        
+        # Read the next line which contains the private key array
+        read -r privkey
+        echo "$privkey"  # Show the private key line in console too
+        
+        # Save private key to a JSON file named after the public key
+        echo "$privkey" > "output/${pubkey}.json"
+    fi
+done
