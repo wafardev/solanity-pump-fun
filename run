@@ -17,6 +17,6 @@ LD_LIBRARY_PATH=./src/release ./src/release/cuda_ed25519_vanity | while read -r 
         echo "$privkey"  # Show the private key line in console too
         
         # Save private key to a JSON file named after the public key
-        echo "$privkey" > "output/${pubkey}.json"
+        echo -n "$privkey" > "output/${pubkey}.json"
     fi
 done
