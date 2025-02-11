@@ -1,22 +1,64 @@
 #!/bin/bash
 
-# Create output directory if it doesn't exist
-mkdir -p output
+# Ask user for CPU or GPU option
+echo "Select key generation method:"
+echo "1) Use CPU (requires Solana CLI)"
+echo "2) Use GPU (requires CUDA-capable GPU)"
+read -p "Enter 1 for CPU or 2 for GPU: " choice
 
-# Run the vanity key generator and process its output
-LD_LIBRARY_PATH=./src/release ./src/release/cuda_ed25519_vanity | while read -r line; do
-    echo "$line"  # Still show output in console
-    
-    # Check if line contains a MATCH
-    if [[ $line == *"MATCH"* ]]; then
-        # Extract public key (everything between MATCH and -)
-        pubkey=$(echo "$line" | grep -o 'MATCH [^ ]* -' | sed 's/MATCH \(.*\) -/\1/')
+# Check user input and run the corresponding key generation method
+if [ "$choice" -eq 2 ]; then
+    # GPU option - run cuda_ed25519_vanity tool
+    echo "Running GPU-based key generation using cuda_ed25519_vanity...\n"
+
+    # Run the vanity key generator and process its output
+    LD_LIBRARY_PATH=./src/release ./src/release/cuda_ed25519_vanity | while read -r line; do
+        echo "$line"  # Show output in the console
         
-        # Read the next line which contains the private key array
-        read -r privkey
-        echo "$privkey"  # Show the private key line in console too
-        
-        # Save private key to a JSON file named after the public key
-        echo -n "$privkey" > "output/${pubkey}.json"
-    fi
-done
+        # Check if line contains a MATCH
+        if [[ $line == *"MATCH"* ]]; then
+            # Extract public key (everything between MATCH and -)
+            pubkey=$(echo "$line" | grep -o 'MATCH [^ ]* -' | sed 's/MATCH \(.*\) -/\1/')
+            
+            # Read the next line which contains the private key array
+            read -r privkey
+            echo "$privkey"  # Show the private key line in console too
+            echo "\n"
+            
+            # Save private key in a Supabase table
+            node server.js "$pubkey" "$privkey"
+        fi
+    done
+
+elif [ "$choice" -eq 1 ]; then
+    # CPU option - run solana-keygen
+    echo "Running CPU-based key generation using solana-keygen...\n"
+
+    while true; do
+            solana-keygen grind --ends-with pump:1 --use-mnemonic --no-bip39-passphrase --no-outfile | while read -r line; do
+        if [[ $line == *"Found matching key"* ]]; then
+            # Extract public key
+            public_key=$(echo "$line" | awk '{print $4}')
+            echo "Public Key: $public_key"
+            
+            # Read the seed phrase after 3 lines
+            read -r line
+            read -r line
+            read -r line
+            seed_phrase=$(echo "$line")
+            echo "Seed Phrase: $seed_phrase"
+            echo "\n"
+
+            # Run server.js with the generated public key and seed phrase
+            node server.js "$public_key" "$seed_phrase"
+        fi
+        done
+    done
+
+else
+    # Invalid input, exit the script
+    echo "Invalid input. Please enter 1 for CPU or 2 for GPU."
+    exit 1
+fi
+
+

@@ -38,6 +38,13 @@ Sol though.
 ## Configure
 Open `src/config.h` and add any prefixes you want to scan for to the list.
 
+## Installing
+Install all necessary dependencies with:
+
+```bash
+npm install
+```
+
 ## Building
 Make sure your cuda binary are in your path, and build:
 

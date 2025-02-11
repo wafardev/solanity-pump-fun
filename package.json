@@ -1,0 +1,26 @@
+{
+  "name": "solanity",
+  "version": "1.0.0",
+  "description": "I originally copied this from here: https://github.com/ChorusOne/solanity",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wafardev/solanity.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wafardev/solanity/issues"
+  },
+  "homepage": "https://github.com/wafardev/solanity#readme",
+  "dependencies": {
+    "@solana/web3.js": "^1.98.0",
+    "@supabase/supabase-js": "^2.48.1",
+    "bip39": "^3.1.0",
+    "dotenv": "^16.4.7"
+  }
+}

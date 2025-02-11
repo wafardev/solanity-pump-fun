@@ -1,3 +1,5 @@
 ./src/release/*
 src/release/*
 src/release
+.env
+node_modules
