@@ -1,4 +1,4 @@
-# Find a Solana vanity address using GPUs
+# Find a Solana vanity Pump Fun address using your GPUs or CPUs
 
 I originally copied this from here: https://github.com/ChorusOne/solanity
 
